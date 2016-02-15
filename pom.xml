@@ -3,11 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>JaMP</groupId>
-    <artifactId>brInfoParser</artifactId>
-    <version>1.0</version>
+    <artifactId>idgenerator</artifactId>
+    <version>1.1</version>
     <packaging>jar</packaging>
 
-    <name>Framework.Spring.Core</name>
+    <name>idgenerator</name>
     <url>http://maven.apache.org</url>
 
     <properties>
