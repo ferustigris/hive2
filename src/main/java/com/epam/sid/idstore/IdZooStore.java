@@ -10,13 +10,13 @@ import java.io.IOException;
 /**
  * Implements storing IDs in zookeeper
  */
-public class IdZooStore1 implements IdStore, Watcher {
+public class IdZooStore implements IdStore, Watcher {
     private ZooKeeper zk;
     Stat st = new Stat();
-    private static final Log log = LogFactory.getLog(IdZooStore1.class.getName());
+    private static final Log log = LogFactory.getLog(IdZooStore.class.getName());
     private int attemptCount = 3;
 
-    public IdZooStore1() {
+    public IdZooStore() {
         String host = "localhost";
         int port = 2181;
         try {
@@ -73,7 +73,7 @@ public class IdZooStore1 implements IdStore, Watcher {
         // Get current value
         byte[] uid = zk.getData(node, false, st);
         long id = Long.parseLong(new String(uid));
-        uid = String.valueOf(id).getBytes();
+        uid = String.valueOf(id + 1).getBytes();
         // Update value
         zk.setData(node, uid, st.getVersion());
         return id;

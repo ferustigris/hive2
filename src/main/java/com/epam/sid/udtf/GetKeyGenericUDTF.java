@@ -1,7 +1,7 @@
 package com.epam.sid.udtf;
 
 import com.epam.sid.idstore.IdStore;
-import com.epam.sid.idstore.IdZooStore1;
+import com.epam.sid.idstore.IdZooStore;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hive.ql.exec.Description;
@@ -34,7 +34,7 @@ import java.util.List;
 )
 public class GetKeyGenericUDTF extends GenericUDTF {
     private static final String IDColumnName = "id";
-    private IdStore store = new IdZooStore1();
+    private IdStore store = new IdZooStore();
     private static final Log log = LogFactory.getLog(GetKeyGenericUDTF.class.getName());
 
     /**
