@@ -10,22 +10,15 @@ import java.io.IOException;
 /**
  * Implements storing IDs in zookeeper
  */
-public class IdZooStore implements IdStore, Watcher {
+public class IdZooStore implements IdStore {
     private ZooKeeper zk;
     Stat st = new Stat();
     private static final Log log = LogFactory.getLog(IdZooStore.class.getName());
-    private int attemptCount = 3;
+    private int attemptCount;
 
-    public IdZooStore() {
-        String host = "localhost";
-        int port = 2181;
-        try {
-            zk = new ZooKeeper(host, port, this);
-        } catch (IOException e) {
-            String msg = "Can't connect to ZooKeeper(" + host + ", " + port + ")";
-            log.error(msg, e);
-            throw new RuntimeException(msg);
-        }
+    public IdZooStore(ZooKeeper zoo, int attemptCount) {
+        this.attemptCount = attemptCount;
+        this.zk = zoo;
     }
 
     public long getNextId(String sequenceName) {
@@ -72,8 +65,8 @@ public class IdZooStore implements IdStore, Watcher {
     private long tryGetAndUpdate(String node) throws KeeperException, InterruptedException {
         // Get current value
         byte[] uid = zk.getData(node, false, st);
-        long id = Long.parseLong(new String(uid));
-        uid = String.valueOf(id + 1).getBytes();
+        long id = Long.parseLong(new String(uid)) + 1;
+        uid = String.valueOf(id).getBytes();
         // Update value
         zk.setData(node, uid, st.getVersion());
         return id;
@@ -89,7 +82,4 @@ public class IdZooStore implements IdStore, Watcher {
         }
     }
 
-    public void process(WatchedEvent watchedEvent) {
-
-    }
 }

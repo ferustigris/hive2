@@ -5,6 +5,7 @@ import com.epam.sid.idstore.IdZooStore;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hive.ql.exec.Description;
+import org.apache.hadoop.hive.ql.exec.MapredContext;
 import org.apache.hadoop.hive.ql.exec.UDFArgumentException;
 import org.apache.hadoop.hive.ql.metadata.HiveException;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDTF;
@@ -13,7 +14,9 @@ import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspectorFactory;
 import org.apache.hadoop.hive.serde2.objectinspector.StructField;
 import org.apache.hadoop.hive.serde2.objectinspector.StructObjectInspector;
 import org.apache.hadoop.hive.serde2.objectinspector.primitive.PrimitiveObjectInspectorFactory;
+import org.apache.zookeeper.ZooKeeper;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -34,8 +37,24 @@ import java.util.List;
 )
 public class GetKeyGenericUDTF extends GenericUDTF {
     private static final String IDColumnName = "id";
-    private IdStore store = new IdZooStore();
+    private IdStore store;
     private static final Log log = LogFactory.getLog(GetKeyGenericUDTF.class.getName());
+
+    public void configure(MapredContext mapredContext) {
+        ZooKeeper zk;
+
+        String host = "localhost";
+        int port = 2181;
+        try {
+            zk = new ZooKeeper(host, port, null);
+        } catch (IOException e) {
+            String msg = "Can't connect to ZooKeeper(" + host + ", " + port + ")";
+            log.error(msg, e);
+            throw new RuntimeException(msg);
+        }
+        store = new IdZooStore(zk, 3);
+    }
+
 
     /**
      * Calls before first processing
@@ -46,6 +65,7 @@ public class GetKeyGenericUDTF extends GenericUDTF {
     @Override
     public StructObjectInspector initialize(StructObjectInspector argOIs) throws UDFArgumentException {
         log.debug("initialize..");
+
         List<String> fieldNames = new ArrayList<String>();
         List<ObjectInspector> fieldOIs = new ArrayList<ObjectInspector>();
 
